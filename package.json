@@ -1,0 +1,21 @@
+{
+  "name": "node_inond_alert_api",
+  "version": "1.0.0",
+  "description": "It's an api for mobile application Inond Alert.",
+  "main": "app.js",
+  "scripts": {
+    "start": "cross-env NODE_ENV=production node app.js",
+    "dev": "cross-env NODE_ENV=developpement nodemon app.js"
+  },
+  "author": "Gafour",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2",
+    "sequelize": "^6.37.4",
+    "serve-favicon": "^2.5.0"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "nodemon": "^3.1.4"
+  }
+}
