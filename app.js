@@ -2,11 +2,55 @@ const express = require("express");
 const morgan = require("morgan");
 const favicon = require("serve-favicon");
 const bodyParser = require("body-parser");
+const { Sequelize, DataTypes } = require('sequelize')
 const { success, getUniqueId } = require("./helper");
 let pokemons = require("./mock-pockemon");
+const PokemonModel = require('./src/models/pokemon')
 
 const app = express();
 const port = 3000;
+
+const sequelize = new Sequelize(
+  'pokedex',
+  'root',
+  '',
+  {
+    host: 'localhost',
+    dialect: 'mariadb',
+    port: '3308',
+    dialectOptions: {
+      timezone: 'Etc/GMT-2'
+    },
+    logging: false
+  }
+)
+
+sequelize.authenticate()
+  .then(_ => console.log('La connexion a la base de donnees a bien ete etablie.'))
+  .catch(error => console.error(`Impossible de se connecter a la base de donnees : ${error.message}`))
+
+const Pokemon = PokemonModel(sequelize, DataTypes)
+
+sequelize.sync({force: true})
+  .then(_ => {
+    console.log('La base de donnees Pokedex a bien ete synchronisee.')
+    pokemons.map(pokemon => {
+      Pokemon.create({
+        name: pokemon.name,
+        hp: pokemon.hp,
+        cp: pokemon.cp,
+        picture: pokemon.picture,
+        types: pokemon.types.join()
+      }).then(pokemon => console.log(`Le pokemon ${pokemon.name} a ete ajoute a la base de donnees.`))
+    })
+    // Pokemon.create({
+    //   name: "Bulbizarre",
+    //  hp: 25,
+    //  cp: 5,
+    //  picture: "https://assets.pokemon.com/assets/cms2/img/pokedex/detail/001.png",
+    //  types: ["Plante", "Poison"].join()
+    // }).then(bulbizarre => console.log(bulbizarre.toJSON()))
+  })
 
 app
   .use(favicon(__dirname + "/favicon.ico"))
