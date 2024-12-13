@@ -4,8 +4,16 @@ module.exports = (app) => {
     app.get('/api/pokemons/:id', (req, res) => {
         Pokemon.findByPk(req.params.id)
         .then(pokemon => {
+            if(pokemon === null) {
+                const message = 'Le pokemon demande n\'exite pas. Reesayez avec un autre identifiant'
+                return res.status(404).json({message})
+            }
             const message = 'Le pokemon a bien ete trouve.'
             res.json({ message, data: pokemon})
+        })
+        .catch(error => {
+            const message = 'Le pokemon n\'a pas pu etre recupere. Reesayez dans quelques instants.'
+            res.status(500).json({ message, data: error })
         })
     })
 }
