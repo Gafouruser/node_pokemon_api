@@ -2,23 +2,37 @@ const { Sequelize, DataTypes } = require("sequelize");
 const PokemonModel = require("../models/pokemon");
 const UserModel = require("../models/user");
 const pokemons = require("./mock-pockemon");
-const bcrypt = require('bcrypt')
+const bcrypt = require("bcrypt");
 
-const sequelize = new Sequelize("pokedex", "root", "", {
-  host: "localhost",
-  port: "3308",
-  dialect: "mariadb",
-  dialectOptions: {
-    timezone: "Etc/GMT-2",
-  },
-  logging: false,
-});
+let sequelize;
+
+if (process.env.NODE_ENV === "production") {
+  sequelize = new Sequelize("pokedex", "root", "", {
+    host: "localhost",
+    port: "3308",
+    dialect: "mariadb",
+    dialectOptions: {
+      timezone: "Etc/GMT-2",
+    },
+    logging: false,
+  });
+} else {
+  sequelize = new Sequelize("pokedex", "root", "", {
+    host: "localhost",
+    port: "3308",
+    dialect: "mariadb",
+    dialectOptions: {
+      timezone: "Etc/GMT-2",
+    },
+    logging: false,
+  });
+}
 
 const Pokemon = PokemonModel(sequelize, DataTypes);
 const User = UserModel(sequelize, DataTypes);
 
 const initDb = () => {
-  return sequelize.sync({ force: true }).then((_) => {
+  return sequelize.sync().then((_) => {
     pokemons.map((pokemon) => {
       Pokemon.create({
         name: pokemon.name,
@@ -29,15 +43,13 @@ const initDb = () => {
       }).then((pokemon) => console.log(pokemon.toJSON()));
     });
 
-    bcrypt.hash('pikachu', 10)
-    .then(hash => {
+    bcrypt.hash("pikachu", 10).then((hash) => {
       User.create({
         username: "pikachu",
         password: hash,
-      })
-    .then(user => console.log(user.toJSON()))
-    })
-    
+      }).then((user) => console.log(user.toJSON()));
+    });
+
     console.log("La base de donnees a bien ete initialisee !");
   });
 };
