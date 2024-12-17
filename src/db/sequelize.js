@@ -42,7 +42,7 @@ const Pokemon = PokemonModel(sequelize, DataTypes);
 const User = UserModel(sequelize, DataTypes);
 
 const initDb = () => {
-  return sequelize.sync().then(() => {
+  return sequelize.sync({ force: true }).then(() => {
     console.log("La base de données a bien été initialisée !");
     pokemons.forEach((pokemon) => {
       Pokemon.create({
